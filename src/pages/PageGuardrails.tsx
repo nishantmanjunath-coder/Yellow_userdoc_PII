@@ -82,6 +82,7 @@ export default function PageGuardrails() {
             <li><strong>Fail-Closed Design:</strong> If the PII detection service encounters an error, the system automatically blocks the message to prevent data leakage.</li>
             <li><strong>Custom Entities:</strong> Beyond standard PII (Name, Email), define your own regex patterns for Order IDs, Policy Numbers, or Tracking Codes.</li>
             <li><strong>Visual Trust Indicators:</strong> Developers see clear "Green Shield" icons in the Studio, confirming that a variable is protected by global policies.</li>
+            <li><strong>Broad LLM Support:</strong> Seamlessly integrates with major providers including Azure OpenAI, Anthropic, and Google, ensuring compliance regardless of your underlying AI model.</li>
             </ul>
         </div>
 
@@ -125,6 +126,35 @@ export default function PageGuardrails() {
         <ul className="list-disc pl-5 space-y-2">
             <li><strong>Action:</strong> Data is captured, encrypted, and stored temporarily for the session duration.</li>
             <li><strong>Access:</strong> The raw value is available only to the secure API execution layer. Logs and debugging tools continue to see only the masked version.</li>
+        </ul>
+
+        {/* ARCHITECTURE & DATA FLOW */}
+        <h2 className="text-2xl font-semibold mt-16 mb-6 pb-2 border-b">
+            Architecture & Data Flow
+        </h2>
+
+        <p className="my-6">
+            Understanding how data moves through the system is critical for security compliance. The following diagram illustrates the lifecycle of a message containing sensitive data (PII).
+        </p>
+
+        <div className="my-10 flex justify-center bg-gray-50 p-4">
+            <img
+            src="/architecture_diagram.png"
+            alt="Architecture & Data Flow Diagram"
+            className="max-w-6xl w-full h-auto object-contain rounded-2xl shadow-lg"
+            />
+        </div>
+
+        <h3 className="text-xl font-semibold mt-8">
+            Flow Breakdown
+        </h3>
+
+        <ul className="list-disc pl-5 space-y-2 my-6">
+            <li><strong>Ingestion:</strong> The user sends a message containing sensitive data (e.g., SSN, Email).</li>
+            <li><strong>Interception:</strong> Before any processing logic occurs, the Platform sends the raw text to the PII Detection Service.</li>
+            <li><strong>Redaction:</strong> The service identifies entities based on Admin policies and returns a sanitized version (e.g., [SSN-REDACTED]).</li>
+            <li><strong>Inference:</strong> The Platform sends only the redacted message to the Third-Party LLM. The external AI provider never receives the raw PII.</li>
+            <li><strong>Storage:</strong> Finally, the conversation is logged in the database using the redacted/masked content, ensuring long-term compliance (GDPR/audit trails).</li>
         </ul>
 
         {/* CONFIG GUIDE */}
@@ -304,6 +334,7 @@ export default function PageGuardrails() {
         <li>In Additional Settings, check Enable Sensitive Data Handling.
             <ul className="list-disc pl-5 space-y-2">
                 <li><em>System Message: </em>"This input follows admin protection configurations. Data is stored securely and deleted after the session."</li>
+                <li><em>Privacy Action: </em>You will see a read-only field labeled Privacy Action (e.g., "Masking"). This confirms exactly how the data will be treated upon capture.</li>
             </ul>
         </li>
         <li>Map it to a variable. The platform handles the encryption automatically.</li>
